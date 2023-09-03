@@ -7,38 +7,44 @@ import argparse
 def convert_audio_files(input_dir, output_dir, input_format, output_format, max_threads=8):
     input_files = []
 
-    # Traverse all audio files in the input directory
-    for root, _, files in os.walk(input_dir):
-        for file in files:
-            if file.endswith(f".{input_format}"):
-                input_files.append(os.path.join(root, file))
+    # Create a tqdm progress bar for file traversal
+    with tqdm(desc="Scanning Files") as file_bar:
+        # Traverse all audio files in the input directory
+        for root, _, files in os.walk(input_dir):
+            for file in files:
+                if file.endswith(f".{input_format}"):
+                    input_files.append(os.path.join(root, file))
+                    file_bar.update(1)  # Update the file traversal progress
 
-    # Define a function to convert audio files to the specified format and update the progress bar
-    def convert_audio_to_format_with_progress(input_file, output_dir, output_format, pbar):
-        try:
-            audio = AudioSegment.from_file(input_file, format=input_format)
-            # Get the output file name, e.g., /path/to/output_dir/subfolder/file.wav
-            output_file = os.path.join(output_dir, os.path.relpath(input_file, input_dir)[:-len(input_format) - 1] + f".{output_format}")
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)  # Create subdirectories
-            audio.export(output_file, format=output_format)
-        except Exception as e:
-            tqdm.write(f"Error converting {input_file}: {str(e)}")
-        pbar.update(1)  # Manually update the progress bar
+    # Create a tqdm progress bar for file conversion
+    with tqdm(total=len(input_files), desc="Converting") as pbar:
+        # Define a function to convert audio files to the specified format
+        def convert_audio_to_format(input_file, output_dir, output_format):
+            try:
+                audio = AudioSegment.from_file(input_file, format=input_format)
+                # Get the output file name, e.g., /path/to/output_dir/subfolder/file.wav
+                output_file = os.path.join(output_dir, os.path.relpath(input_file, input_dir)[:-len(input_format) - 1] + f".{output_format}")
+                os.makedirs(os.path.dirname(output_file), exist_ok=True)  # Create subdirectories
+                audio.export(output_file, format=output_format)
+                return None
+            except Exception as e:
+                return f"Error converting {input_file}: {str(e)}"
 
-    # Create a tqdm progress bar
-    with tqdm(total=len(input_files)) as pbar:
         # Create a thread pool
         with concurrent.futures.ThreadPoolExecutor(max_threads) as executor:
             futures = []
 
             # Submit tasks to the thread pool
             for input_file in input_files:
-                future = executor.submit(convert_audio_to_format_with_progress, input_file, output_dir, output_format, pbar)
+                future = executor.submit(convert_audio_to_format, input_file, output_dir, output_format)
+                future.add_done_callback(lambda p: pbar.update(1))
                 futures.append(future)
 
-            # Wait for all tasks to complete
+            # Process the results and display errors
             for future in concurrent.futures.as_completed(futures):
-                pass
+                error_message = future.result()
+                if error_message:
+                    tqdm.write(error_message)
 
     print("All conversions completed.")
 
