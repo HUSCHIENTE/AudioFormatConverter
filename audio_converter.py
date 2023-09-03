@@ -7,14 +7,18 @@ import argparse
 def convert_audio_files(input_dir, output_dir, input_format, output_format, max_threads=8):
     input_files = []
 
+    def scan_directory(path):
+        for entry in os.scandir(path):
+            if entry.is_file() and entry.name.endswith(f".{input_format}"):
+                input_files.append(entry.path)
+                file_bar.update(1)  # Increment the progress for each file found
+            elif entry.is_dir():
+                scan_directory(entry.path)
+
     # Create a tqdm progress bar for file traversal
-    with tqdm(desc="Scanning Files") as file_bar:
-        # Traverse all audio files in the input directory
-        for root, _, files in os.walk(input_dir):
-            for file in files:
-                if file.endswith(f".{input_format}"):
-                    input_files.append(os.path.join(root, file))
-                    file_bar.update(1)  # Update the file traversal progress
+    file_bar = tqdm(total=0, desc="Scanning Files")  # Initialize with total=0
+    scan_directory(input_dir)
+    file_bar.total = len(input_files)  # Update the total count for the progress bar
 
     # Create a tqdm progress bar for file conversion
     with tqdm(total=len(input_files), desc="Converting") as pbar:
@@ -30,21 +34,18 @@ def convert_audio_files(input_dir, output_dir, input_format, output_format, max_
             except Exception as e:
                 return f"Error converting {input_file}: {str(e)}"
 
-        # Create a thread pool
+        # Create a thread pool for file conversion
         with concurrent.futures.ThreadPoolExecutor(max_threads) as executor:
             futures = []
 
-            # Submit tasks to the thread pool
+            # Submit tasks to the thread pool for file conversion
             for input_file in input_files:
                 future = executor.submit(convert_audio_to_format, input_file, output_dir, output_format)
                 future.add_done_callback(lambda p: pbar.update(1))
                 futures.append(future)
 
-            # Process the results and display errors
-            for future in concurrent.futures.as_completed(futures):
-                error_message = future.result()
-                if error_message:
-                    tqdm.write(error_message)
+            # Wait for all file conversion tasks to complete
+            concurrent.futures.wait(futures)
 
     print("All conversions completed.")
 
