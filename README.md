@@ -17,6 +17,9 @@ Audio Format Converter is a versatile Python tool for executing audio format con
 
    ```shell
    pip install pydub tqdm
+   
+   #Getting ffmpeg set up
+   apt-get install ffmpeg libavcodec-extra
 
 ## Usage
 Convert audio files from one format to another using the following command:
