@@ -12,7 +12,7 @@ Audio Format Converter is a versatile Python tool for executing audio format con
 1. Clone this repository to your local machine:
 
    ```shell
-   git clone https://github.com/yourusername/audio-format-converter.git
+   git clone https://github.com/HSUCHIENTE/audio-format-converter.git
 2. Install the required dependencies:
 
    ```shell
