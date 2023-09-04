@@ -6,6 +6,7 @@ Audio Format Converter is a versatile Python tool for executing audio format con
 - Converts audio files from one format to another (e.g., from m4a to wav).
 - Supports multi-threaded conversion for faster processing.
 - Provides progress tracking with a progress bar.
+- Allows changing the sample rate during conversion.
 
 ## Installation
 
