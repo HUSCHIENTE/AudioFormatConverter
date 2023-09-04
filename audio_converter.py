@@ -4,7 +4,7 @@ from tqdm import tqdm
 from pydub import AudioSegment
 import argparse
 
-def scan_directory(input_dir, input_format, show_scanning_progress=False):  # 添加 show_scanning_progress 参数，默认为 False
+def scan_directory(input_dir, input_format, show_scanning_progress=False):  # Add a show_scanning_progress parameter, with a default value of False
     input_files = []
 
     def scan(path):
