@@ -33,6 +33,8 @@ Convert audio files from one format to another using the following command:
 - --input_format : (Optional) The input audio format (default: m4a).
 - --output_format : (Optional) The output audio format (default: wav).
 - --max_threads : (Optional) Maximum number of threads for concurrent conversion (default: 8).
+- --target_sample_rate (int) : Target sample rate (default: None, no change).
+- --show_scanning_progress : (Optional) This flag, when included in the command, enables the display of a progress bar during the scanning phase of audio files. By default, it's set to False, meaning that no scanning progress bar is displayed. Users can include this flag to see the progress of the scanning process if desired.
 
 
 ## Examples
