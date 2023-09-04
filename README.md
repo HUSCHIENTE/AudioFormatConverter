@@ -37,11 +37,3 @@ Convert audio files from one format to another using the following command:
 - --show_scanning_progress : (Optional) This flag, when included in the command, enables the display of a progress bar during the scanning phase of audio files. By default, it's set to False, meaning that no scanning progress bar is displayed. Users can include this flag to see the progress of the scanning process if desired.
 
 
-## Examples
-Convert all audio files in the "input_audio" directory to the "output_audio" directory:
-
-  ```shell
-python audio_converter.py input_audio output_audio --input_format mp3 --output_format ogg --max_threads 4
-  ```
-
-
