@@ -26,7 +26,7 @@ def scan_directory(input_dir, input_format, show_scanning_progress=False):  # Ad
 
     return input_files
 
-def convert_audio_to_format(input_file, output_dir, input_format, output_format, target_sample_rate):
+def convert_audio_to_format(input_dir, input_file, output_dir, input_format, output_format, target_sample_rate):
     try:
         audio = AudioSegment.from_file(input_file, format=input_format)
 
@@ -53,7 +53,7 @@ def convert_audio_files(input_dir, output_dir, input_format, output_format, max_
 
             # Submit tasks to the thread pool for file conversion
             for input_file in input_files:
-                future = executor.submit(convert_audio_to_format, input_file, output_dir, input_format, output_format, target_sample_rate)
+                future = executor.submit(convert_audio_to_format, input_dir, input_file, output_dir, input_format, output_format, target_sample_rate)
                 future.add_done_callback(lambda p: pbar.update(1))
                 futures.append(future)
 
