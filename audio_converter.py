@@ -1,3 +1,5 @@
+import datetime
+import json
 import os
 import concurrent.futures
 from tqdm import tqdm
@@ -77,3 +79,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def get_current_time():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# Check if all files have been processed
+if len(completed_files) == len(input_files):
+    # Get current time
+    completion_time = get_current_time()
+
+    # Read the existing progress data and add completion time
+    progress_data = read_progress_file(progress_file)
+    progress_data['completion_time'] = completion_time
+
+    # Write the updated data back to the file
+    write_progress_file(progress_file, progress_data)
+
+    # Rename the file to a log file
+    log_file = progress_file.replace('.json', '.log')
+    os.rename(progress_file, log_file)
